@@ -1,4 +1,4 @@
-name: Build Flet APKS
+name: Build Flet APK
 
 on:
   push:
@@ -38,7 +38,7 @@ jobs:
         channel: 'stable'
 
     - name: Automatically Accept All Licenses & System Prompts
-      # الموافقة على رخص أندرويد وفلاتر بأكثر من طريقة لضمان تخطيها
+      # الموافقة على رخص أندرويد وفلاتر تلقائياً لتفادي أي نوافذ
       run: |
         mkdir -p ${{ github.workspace }}/Android/sdk/licenses || true
         echo -e "\n8933bad161adac78b90f114c1863003a253d5019\n45f944a904d32b50bf604d4124b87563d34729b8\n84831b9409646a918e30573bab4c9c91346d8abd\n504667f4c0de7af1a06de9f4b1727b84351f2910\n27103150a04576831d1e44f83f21fbdd3ca0e065\n11333f6a35b273f50544ccb708b3d697517c3857" > ${{ github.workspace }}/Android/sdk/licenses/android-sdk-license || true
@@ -51,9 +51,9 @@ jobs:
         yes | pip install -r requirements.txt --yes || true
 
     - name: Build APK via Flet CLI
-      # تشغيل أمر البناء مع إرسال موافقة مستمرة لأي سؤال داخلي
+      # 💡 تم الإصلاح هنا: استدعاء الأداة من خلال وحدة بايثون لتفادي خطأ عدم العثور على المسار
       run: |
-        yes y | flet build apk
+        yes y | python -m flet build apk
 
     - name: Upload APK Artifact
       uses: actions/upload-artifact@v4
