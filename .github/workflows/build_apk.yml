@@ -55,10 +55,12 @@ jobs:
         pip install -r requirements.txt
         echo "/home/runner/.local/bin" >> $GITHUB_PATH
 
+
     - name: Build APK via Flet CLI
+      # 💡 تم الإصلاح هندسياً: استخدام الاختصار الرسمي المعتمد --arch وإضافة --yes للموافقات المطلقة
       run: |
         export PATH=$PATH:/home/runner/.local/bin
-        flet build apk --target-arch arm64-v8a
+        flet build apk --arch arm64-v8a --yes
 
 
     - name: Upload APK Artifact
