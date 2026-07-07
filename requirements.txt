@@ -1,4 +1,1 @@
 flet==0.85.3
-flet-core==0.85.3
-fastapi==0.139.0
-pydantic==2.13.4
