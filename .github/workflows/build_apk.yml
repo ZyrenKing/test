@@ -32,12 +32,13 @@ jobs:
         java-version: '17'
 
     - name: Set up Flutter
+      # 💡 تم تعيين الإصدار الصريح والواضح الذي طلبته لحل مشكلة السؤال تماماً
       uses: subosito/flutter-action@v2
       with:
-        channel: 'stable' # سنتركها تجلب أحدث نسخة متوافقة تلقائياً
+        channel: 'stable'
+        flutter-version: '3.41.7'
 
-    - name: Install Linux GTK Libraries (Required for Flet CLI on Linux)
-      # 💡 تم إضافة هذه الخطوة لحل مشكلة نقص مكتبات GTK على خادم لينكس
+    - name: Install Linux GTK Libraries
       run: |
         sudo apt-get update
         sudo apt-get install -y libgtk-3-dev ninja-build
@@ -55,10 +56,9 @@ jobs:
         echo "/home/runner/.local/bin" >> $GITHUB_PATH
 
     - name: Build APK via Flet CLI
-      # تشغيل البناء مع إضافة التعطيل التام لأي مدخلات تفاعلية
       run: |
         export PATH=$PATH:/home/runner/.local/bin
-        yes y | flet build apk --no-prompt
+        flet build apk
 
     - name: Upload APK Artifact
       uses: actions/upload-artifact@v4
