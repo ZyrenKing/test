@@ -16,6 +16,10 @@ jobs:
   build:
     runs-on: ubuntu-latest
 
+    # تفعيل صلاحيات الكتابة للخادم لكي يتمكن من حفظ الملف في مستودعك
+    permissions:
+      contents: write
+
     steps:
     - name: Checkout Repository
       uses: actions/checkout@v4
@@ -59,9 +63,14 @@ jobs:
         export PATH=$PATH:/home/runner/.local/bin
         flet build apk --arch arm64-v8a
 
-    - name: Upload APK Artifact
-      uses: actions/upload-artifact@v4
+    - name: Push APK directly to Repository Branch
+      # 💡 خطوة سحرية: البحث عن ملف الـ APK في أي مكان مخفي وحفظه بداخل مستودعك الخاص فوراً
+      run: |
+        mkdir -p deploy_apk
+        find build/ -name "*.apk" -exec cp {} deploy_apk/app-release.apk \;
+        
+    - name: Deploy APK to GitHub Branch
+      uses: JamesIves/github-pages-deploy-action@v4
       with:
-        name: my-flet-app-apk
-        # 💡 التعديل هنا: الخادم سيذهب مباشرة للمسار الحقيقي الذي تم البناء فيه دون عناء
-        path: build/apk/arm64-v8a/app-release.apk
+        folder: deploy_apk
+        branch: apk-release # اسم الفرع الجديد الذي ستجده في مستودعك ويحتوي على الملف
