@@ -36,23 +36,27 @@ jobs:
       with:
         channel: 'stable'
 
-    - name: Automatically Accept All Licenses & System Prompts
+    - name: Automatically Accept All Licenses
       run: |
         mkdir -p ${{ github.workspace }}/Android/sdk/licenses || true
         echo -e "\n8933bad161adac78b90f114c1863003a253d5019\n45f944a904d32b50bf604d4124b87563d34729b8\n84831b9409646a918e30573bab4c9c91346d8abd\n504667f4c0de7af1a06de9f4b1727b84351f2910\n27103150a04576831d1e44f83f21fbdd3ca0e065\n11333f6a35b273f50544ccb708b3d697517c3857" > ${{ github.workspace }}/Android/sdk/licenses/android-sdk-license || true
         yes | flutter doctor --android-licenses || true
 
-    - name: Install Dependencies
-      # تم إضافة التثبيت العام وتصدير المسارات لتفادي مشكلة الاختفاء
+    - name: Create Venv, Install Dependencies & Build APK
+      # 💡 الحل الجذري: إنشاء بيئة venv وتفعيلها والبناء في كتلة برمجية واحدة متصلة
       run: |
-        yes | python -m pip install --upgrade pip --yes || true
-        yes | pip install -r requirements.txt --user --yes || true
-        echo "$HOME/.local/bin" >> $GITHUB_PATH
-
-    - name: Build APK via Flet CLI
-      # استدعاء الأمر المباشر والمحمي بـ yes المكرر للموافقات اللانهائية
-      run: |
-        yes y | flet build apk
+        # 1. إنشاء البيئة الوهمية داخل الخادم
+        python -m venv venv
+        
+        # 2. تفعيل البيئة الوهمية بنظام لينكس
+        source venv/bin/activate
+        
+        # 3. تحديثpip وتثبيت متطلبات مشروعك المستخرجة سابقاً داخل الـ venv
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+        
+        # 4. تشغيل أمر البناء الرسمي والذكي لـ Flet عبر وحدة بايثون داخل البيئة
+        python -m flet build apk
 
     - name: Upload APK Artifact
       uses: actions/upload-artifact@v4
