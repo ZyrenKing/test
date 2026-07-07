@@ -6,7 +6,6 @@ on:
       - main
   workflow_dispatch:
 
-# إجبار الخادم بأكمله على وضع عدم التفاعل والموافقة التلقائية لجميع الأدوات
 env:
   DEBIAN_FRONTEND: noninteractive
   ACCEPT_ALL_ANDROID_LICENSES: "true"
@@ -38,22 +37,22 @@ jobs:
         channel: 'stable'
 
     - name: Automatically Accept All Licenses & System Prompts
-      # الموافقة على رخص أندرويد وفلاتر تلقائياً لتفادي أي نوافذ
       run: |
         mkdir -p ${{ github.workspace }}/Android/sdk/licenses || true
         echo -e "\n8933bad161adac78b90f114c1863003a253d5019\n45f944a904d32b50bf604d4124b87563d34729b8\n84831b9409646a918e30573bab4c9c91346d8abd\n504667f4c0de7af1a06de9f4b1727b84351f2910\n27103150a04576831d1e44f83f21fbdd3ca0e065\n11333f6a35b273f50544ccb708b3d697517c3857" > ${{ github.workspace }}/Android/sdk/licenses/android-sdk-license || true
         yes | flutter doctor --android-licenses || true
 
     - name: Install Dependencies
-      # تحديث وتثبيت الحزم البرمجية مع تأكيد إجباري صامت
+      # تم إضافة التثبيت العام وتصدير المسارات لتفادي مشكلة الاختفاء
       run: |
         yes | python -m pip install --upgrade pip --yes || true
-        yes | pip install -r requirements.txt --yes || true
+        yes | pip install -r requirements.txt --user --yes || true
+        echo "$HOME/.local/bin" >> $GITHUB_PATH
 
     - name: Build APK via Flet CLI
-      # 💡 تم الإصلاح هنا: استدعاء الأداة من خلال وحدة بايثون لتفادي خطأ عدم العثور على المسار
+      # استدعاء الأمر المباشر والمحمي بـ yes المكرر للموافقات اللانهائية
       run: |
-        yes y | python -m flet build apk
+        yes y | flet build apk
 
     - name: Upload APK Artifact
       uses: actions/upload-artifact@v4
